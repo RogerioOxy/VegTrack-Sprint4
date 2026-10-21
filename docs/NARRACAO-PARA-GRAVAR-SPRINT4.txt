@@ -1,0 +1,47 @@
+1. Rogério
+
+Eu sou Rogério Deligi Ferreira Filho, RM 561942. Com Maria Fernanda Garavelli Dantas, RM 562686, apresento o VegTrack à Motiva. O aplicativo organiza a conservação da vegetação, da vistoria à comprovação do serviço. Vamos demonstrar a versão instalada pelo APK.
+
+2. Maria
+
+A Motiva administra 4.475 quilômetros de vias. De janeiro a maio de 2024, foram registrados 3.067 focos de incêndio nas rodovias estaduais concedidas, segundo a ARTESP, em publicação da SEMIL. Para o supervisor Carlos, o Cadú, o desafio é priorizar trechos e conferir a execução.
+
+3. Rogério
+
+Este é o VegTrack instalado no Android, com dados fictícios. Entro como supervisor e vejo o resumo dos trechos e ordens. No mapa esquemático, filtro o intervalo e consulto o histórico para direcionar a equipe.
+
+4. Maria
+
+Em Novo levantamento, seleciono o trecho do quilômetro 23,5 ao 24 e informo 35 centímetros. A partir de 30 centímetros, inclusive, o app classifica o nível 3 e cria uma ordem. Se houver ordem aberta no trecho, associa o levantamento a ela, evitando duplicidade.
+
+5. Rogério
+
+Em Abrir câmera, autorizo o acesso e vejo a prévia. Posso fotografar, refazer e confirmar em Usar esta foto. Nesta demonstração, usamos também a foto de exemplo identificada, com crédito. Os rótulos distinguem Foto do dispositivo e Foto de exemplo.
+
+6. Maria
+
+Em Capturar localização, autorizo o GPS e vejo coordenadas e precisão. Também posso escolher a localização demonstrativa do trecho. Foto e GPS têm origens registradas separadamente. Salvo o levantamento e abro a ordem gerada.
+
+7. Rogério
+
+A OS-2026-0849 mostra trecho, método, prazo e status. Com fauna em restrição no mês, a ordem nasce como roçada manual seletiva. Na ordem bloqueada, uso Iniciar método manual. O calendário mostra espécie e período da restrição.
+
+8. Maria
+
+Inicio e concluo a ordem com foto e localização. A conclusão registra data e responsável. Exporto o PDF e abro o compartilhamento do Android. O relatório reúne dados, histórico e evidências, com os selos Foto de exemplo e GPS demonstrativo.
+
+9. Rogério
+
+Em Mais, seleciono Offline e registro uma alteração. Os dados ficam no aparelho e na fila local. Volto a Normal e toco em Sincronizar fila. Confiro o processamento e a versão VegTrack 4.0.0.
+
+10. Maria
+
+O gestor consulta registros e exporta relatórios. Propomos licença por quilômetro monitorado, com implantação inicial. O piloto prevê 30 quilômetros, a 40 reais por quilômetro ao mês: 1.200 reais mensais. São premissas a validar, com orçamento de experimentação para avaliar adesão, custos e resultados.
+
+11. Rogério
+
+O APK reúne levantamento, câmera, GPS, ordens e PDF, retestados em emulador Android. Faltam testes em aparelho físico e iOS. A seguir: servidor, autenticação, sincronização entre aparelhos e homologação das regras. Hoje, contas e regras são locais; a sincronização é simulada.
+
+12. Maria
+
+A Motiva anunciou em 2025 monitoramento por satélite com inteligência artificial no Rodoanel. Propomos complementar esse monitoramento com execução e evidência de campo. Esperamos reduzir retrabalho e facilitar a conferência dos serviços. No piloto, mediremos tempo entre vistoria e conclusão, revisitas por erro de trecho e ordens com evidência completa.
