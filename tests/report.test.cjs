@@ -4,6 +4,13 @@ const { buildReportHtml } = require('./.test-build/services/reportContent.js');
 
 const completed = { id: 'a', numero: 'OS-001', status: 'concluida', trechoId: 't', kmInicial: 23, kmFinal: 23.5, faixa: 'Marginal', metodo: 'manual_seletiva', criadaEm: '2026-09-19T12:00:00Z', observacoes: '<script>alert(1)</script>', fotoUri: 'demo' };
 const state = { user: { nome: 'Supervisor & equipe' }, config: { kmInicial: 23, kmFinal: 24, mes: 9 }, trechos: [], levantamentos: [], ordens: [completed, {...completed, id:'b', numero:'OS-NÃO-CONCLUÍDA', status:'pendente'}] };
+test('PDF apresenta GPS e precisão em português brasileiro', () => {
+  for (const origem of ['dispositivo', 'demonstracao']) {
+    const html = buildReportHtml({...state, ordens:[{...completed,gps:{lat:-23.5329,lng:-46.8015,accuracy:7.4,origem}}]});
+    assert.match(html, /-23,532900 \/ -46,801500 \| precisão: 7,4 m/);
+    assert.doesNotMatch(html, /7\.4 m|-23\.5329|-46\.8015/);
+  }
+});
 test('relatório inclui somente concluídas e escapa conteúdo de formulário', () => {
   const html = buildReportHtml(state, undefined, {a: 'data:image/png;base64,AA=='});
   assert.match(html, /OS-001/);

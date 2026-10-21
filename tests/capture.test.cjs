@@ -1,5 +1,26 @@
 const test = require('node:test');
+const { precisaPedirPermissao, deveCancelarCaptura, formatarDecimal } = require('./.test-build/domain/capture.js');
 const assert = require('node:assert/strict');
+
+test('permissão concedida evita novo diálogo; permissão ausente ou negada pede autorização', () => {
+  assert.equal(precisaPedirPermissao({granted:true}), false);
+  assert.equal(precisaPedirPermissao({granted:false}), true);
+  assert.equal(precisaPedirPermissao(null), true);
+});
+
+test('diálogo de permissão preserva captura; background real cancela e inactive preserva', () => {
+  for (const state of ['active', 'inactive', 'background']) assert.equal(deveCancelarCaptura(state, true), false);
+  assert.equal(deveCancelarCaptura('background', false), true);
+  assert.equal(deveCancelarCaptura('inactive', false), false);
+  assert.equal(deveCancelarCaptura('active', false), false);
+});
+
+test('precisão e coordenadas usam vírgula sem alterar os números persistidos', () => {
+  assert.equal(formatarDecimal(7.4, 1), '7,4');
+  assert.equal(formatarDecimal(-23.5329, 6), '-23,532900');
+  assert.equal(formatarDecimal(-46.8015, 6), '-46,801500');
+  assert.equal(formatarDecimal(undefined, 1), 'Não informada');
+});
 const { normalizarGps, normalizarEvidencia, rotuloGps, rotuloFoto } = require('./.test-build/domain/capture.js');
 const { comPrazo } = require('./.test-build/services/deadline.js');
 const { VegTrackStore, STORAGE_KEY } = require('./.test-build/domain/engine.js');

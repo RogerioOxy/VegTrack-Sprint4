@@ -9,5 +9,5 @@
     "outDir": "tests/.test-build",
     "rootDir": "src"
   },
-  "include": ["src/domain/**/*.ts", "src/utils/mockData.ts", "src/services/reportContent.ts", "src/services/deadline.ts"]
+  "include": ["src/domain/**/*.ts", "src/utils/mockData.ts", "src/utils/theme.ts", "src/services/reportContent.ts", "src/services/deadline.ts"]
 }

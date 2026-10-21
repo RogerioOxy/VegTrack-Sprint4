@@ -1,5 +1,5 @@
-import React from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Keyboard, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -30,10 +30,18 @@ const tabs: { icon: IconName; activeIcon: IconName; label: string }[] = [
   { icon: 'grid-outline', activeIcon: 'grid', label: 'Mais' },
 ];
 
-function TabBar({ state, navigation }: any) {
+export function TabBar({ state, navigation, descriptors }: any) {
   const { state: appState } = useAppStore();
+  const [keyboardShown, setKeyboardShown] = useState(false);
+  useEffect(() => {
+    const show = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', () => setKeyboardShown(true));
+    const hide = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => setKeyboardShown(false));
+    return () => { show.remove(); hide.remove(); };
+  }, []);
   const abertas = appState.ordens.filter((ordem: any) => ordem.status !== 'concluida').length;
   const naoLidas = appState.notifications.filter((item: any) => !item.lida).length;
+  // A barra personalizada precisa aplicar a mesma opção da BottomTabBar padrão.
+  if (keyboardShown && descriptors[state.routes[state.index].key].options.tabBarHideOnKeyboard) return null;
   return (
     <View style={styles.barShell}>
       <View style={styles.bar}>
@@ -60,7 +68,7 @@ function TabBar({ state, navigation }: any) {
 
 function MainTabs() {
   return (
-    <Tab.Navigator tabBar={props => <TabBar {...props} />} screenOptions={{ headerShown: false, lazy: false }}>
+    <Tab.Navigator tabBar={props => <TabBar {...props} />} screenOptions={{ headerShown: false, lazy: false, tabBarHideOnKeyboard: true }}>
       <Tab.Screen name="MapaTab" component={DashboardScreen} />
       <Tab.Screen name="OrdensTab" component={OrdensScreen} />
       <Tab.Screen name="RegistrarTab" component={NovoLevantamentoScreen} initialParams={{}} />

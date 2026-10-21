@@ -18,6 +18,15 @@ export interface StorageAdapter { getItem(key: string): Promise<string | null>; 
 export const STORAGE_KEY = '@vegtrack/sprint3';
 export const BACKUP_KEY = `${STORAGE_KEY}/antes-do-reset`;
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
+export function proximoNumeroOrdem(ordens: Pick<OrdemServico, 'numero'>[], ano: number): string {
+  const maior = ordens.reduce((max, ordem) => {
+    const match = /^OS-\d{4}-(\d+)$/.exec(ordem.numero);
+    const numero = match ? Number(match[1]) : 0;
+    return Number.isSafeInteger(numero) ? Math.max(max, numero) : max;
+  }, 0);
+  if (!Number.isSafeInteger(maior + 1)) throw new Error('Limite de numeração de ordens atingido.');
+  return `OS-${ano}-${String(maior + 1).padStart(4, '0')}`;
+}
 export function initialSource(): Source {
   return clone({ trechos: mockTrechos, ordens: mockOrdens, fauna: mockFauna, levantamentos: mockHistoricoLevantamentos,
     config: { kmInicial: 23, kmFinal: 67, mes: 6 }, notifications: [], audit: [], pendingSync: 0 });
@@ -139,7 +148,7 @@ export class VegTrackStore {
     const reused = Boolean(ordem);
     if (!ordem && deveCriarOrdem(nivel)) {
       const id = this.id('os');
-      ordem = { id, numero: `OS-DEMO-${id.slice(3)}`, trechoId: trecho.id, kmInicial: trecho.kmInicial, kmFinal: trecho.kmFinal, faixa: trecho.faixa,
+      ordem = { id, numero: proximoNumeroOrdem(next.ordens, this.now().getFullYear()), trechoId: trecho.id, kmInicial: trecho.kmInicial, kmFinal: trecho.kmFinal, faixa: trecho.faixa,
         metodo: next.fauna.some(f => restricaoAtiva(f, next.config.mes, trecho.id)) ? 'manual_seletiva' : 'mecanizada', status: 'pendente', urgencia: 'critica', prazoHoras: 48,
         criadaEm: levantamento.dataRegistro, equipeResponsavel: 'Equipe de demonstração', observacoes: levantamento.observacoes };
       next.ordens.unshift(ordem);

@@ -2,6 +2,34 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { VegTrackStore, STORAGE_KEY, BACKUP_KEY, initialSource } = require('./.test-build/domain/engine.js');
 const { validarFonte } = require('./.test-build/domain/validation.js');
+const { proximoNumeroOrdem } = require('./.test-build/domain/engine.js');
+
+test('número de OS usa ano atual e maior sequência existente, inclusive de outros anos', () => {
+  assert.equal(proximoNumeroOrdem([], 2026), 'OS-2026-0001');
+  const ordens = ['OS-2025-9999', 'OS-DEMO-1792545441568_2', 'OS-2026-0002', 'OS-2026-0847', 'OS-2026-0010', 'OS-2026-invalida'].map(numero => ({numero}));
+  assert.equal(proximoNumeroOrdem(ordens, 2026), 'OS-2026-10000');
+  assert.equal(proximoNumeroOrdem([{numero:'OS-2025-0848'}], 2026), 'OS-2026-0849');
+  assert.equal(proximoNumeroOrdem([{numero:'OS-2026-9999'}], 2026), 'OS-2026-10000');
+});
+
+test('OS sequenciais preservam ID interno e continuam após recarga e mudança de ano', async () => {
+  const seed = initialSource();
+  seed.ordens[0].numero = 'OS-2026-0942';
+  const {store,adapter} = await setup('supervisor',JSON.stringify(seed));
+  const first = await store.registerSurvey(survey());
+  assert.equal(first.ordem.numero, 'OS-2026-0943');
+  assert.match(first.ordem.id, /^os_\d+_\d+$/);
+  const reloaded = await setup('supervisor', adapter.data.get(STORAGE_KEY));
+  await reloaded.store.saveConfig({kmInicial:23.5, kmFinal:24, mes:6});
+  const second = await reloaded.store.registerSurvey(survey('35', 'trecho_002'));
+  assert.equal(second.ordem.numero, 'OS-2026-0944');
+  assert.notEqual(second.ordem.id, first.ordem.id);
+  const nextYear = new VegTrackStore(reloaded.adapter, undefined, () => new Date('2027-01-01T12:00:00Z'));
+  await nextYear.hydrate(); await nextYear.login('supervisor@vegtrack.demo','vegtrack123');
+  await nextYear.saveConfig({kmInicial:23,kmFinal:67,mes:6});
+  const third = await nextYear.registerSurvey(survey('35','trecho_006'));
+  assert.equal(third.ordem.numero, 'OS-2027-0945');
+});
 const gps = { lat: -23.7, lng: -46.5, accuracy: 8 };
 const survey = (altura = '35', trechoId = 'trecho_003') => ({ trechoId, altura, observacoes: 'Teste demonstrativo', gps });
 function storage(seed) {

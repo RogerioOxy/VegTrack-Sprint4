@@ -26,6 +26,11 @@
       },
       "package": "br.com.motiva.vegtrack",
       "versionCode": 4,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "com.google.android.gms.permission.ACTIVITY_RECOGNITION"
+      ],
       "permissions": [
         "CAMERA",
         "ACCESS_FINE_LOCATION",

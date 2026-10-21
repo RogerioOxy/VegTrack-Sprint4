@@ -1,5 +1,13 @@
 export type Origem = 'dispositivo' | 'demonstracao';
 export interface Gps { lat: number; lng: number; accuracy: number; origem: Origem; }
+
+export const precisaPedirPermissao = (permission: { granted: boolean } | null): boolean => !permission?.granted;
+
+// O diálogo do Android pode colocar o app em background durante a autorização.
+export const deveCancelarCaptura = (state: string, pedindoPermissao: boolean): boolean => state === 'background' && !pedindoPermissao;
+
+export const formatarDecimal = (value: number | undefined, casas: number): string =>
+  value === undefined ? 'Não informada' : value.toFixed(casas).replace('.', ',');
 export interface Evidencia { uri: string; origem: Origem; }
 
 export function origemValida(value: unknown): value is Origem {
