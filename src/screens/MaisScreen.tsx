@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useAppStore } from '../store/AppContext';
@@ -47,7 +48,7 @@ export default function MaisScreen({ navigation }: { navigation: any }) {
           </View>
 
           <Card><LabelValue label="Perfil ativo" value={role} /><LabelValue label="Registros de auditoria" value={String(state.audit.length)} /><LabelValue label="Pendências de sincronização" value={String(state.pendingSync)} /></Card>
-          <MessageBanner message="Regras ambientais, coordenadas, usuários e registros desta versão são fictícios e servem somente à avaliação acadêmica." />
+          <Card><SectionHeader title={`Sobre o VegTrack ${Constants.expoConfig?.version ?? 'não informada'}`} /><Text>Real: câmera e GPS acionados por você no Android, fotos salvas no app, registros locais e exportação em PDF.</Text><Text>Demonstrativo: contas, trechos, mapa esquemático, fauna, regras ambientais, OS iniciais, notificações e sincronização sem servidor.</Text><Text>Foto de exemplo e localização demonstrativa são opções identificadas. No navegador, somente essas opções estão disponíveis.</Text></Card>
           <View style={styles.actions}>{user.perfil === 'supervisor' ? <PrimaryButton label="Restaurar demonstração" icon="refresh-outline" variant="outline" loading={busy} onPress={() => run(resetDemo, 'Dados da demonstração restaurados.')} /> : null}<PrimaryButton label="Sair da conta" icon="log-out-outline" variant="ghost" disabled={busy} onPress={() => { void logout(); }} /></View>
         </Content>
       </ScrollView>

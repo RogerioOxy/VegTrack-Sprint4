@@ -1,14 +1,13 @@
-import PhotoCredit from '../components/PhotoCredit';
+import EvidenceFields from '../components/EvidenceFields';
+import { Evidencia, Gps } from '../domain/capture';
 import React, { useEffect, useState } from 'react';
-import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { calcularNivelArtesp } from '../store/AppContext';
 import { useAppStore } from '../store/AppContext';
-import { AlertaAmbiental, AppIcon, Card, Content, DemoBadge, MessageBanner, NivelBadge, Page, PrimaryButton, ScreenHeader, SectionHeader, StatePanel } from '../components';
+import { AlertaAmbiental, AppIcon, Card, Content, MessageBanner, NivelBadge, Page, PrimaryButton, ScreenHeader, SectionHeader, StatePanel } from '../components';
 import { BorderRadius, Colors, Spacing, Typography } from '../utils/theme';
 import { Levantamento, OrdemServico } from '../utils/mockData';
-import { demoPhotoUri } from '../services/demoEvidence';
 
-type Gps = { lat: number; lng: number; accuracy: number };
 type Result = { levantamento: Levantamento; ordem: OrdemServico | null; reused: boolean };
 
 export default function NovoLevantamentoScreen({ navigation, route }: { navigation: any; route: any }) {
@@ -18,32 +17,28 @@ export default function NovoLevantamentoScreen({ navigation, route }: { navigati
   const [altura, setAltura] = useState('');
   const [observacoes, setObservacoes] = useState('');
   const [gps, setGps] = useState<Gps | null>(null);
-  const [gpsDenied, setGpsDenied] = useState(false);
-  const [fotoUri, setFotoUri] = useState<string | null>(null);
+  const [sensorsBusy, setSensorsBusy] = useState(false);
+  const [evidencia, setEvidencia] = useState<Evidencia | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   useEffect(() => {
     const requested = route?.params?.trechoId;
     if (requested && state.trechos.some(item => item.id === requested)) {
-      setTrechoId(requested); setResult(null); setMessage(null);
+      setTrechoId(requested); setGps(null); setEvidencia(null); setResult(null); setMessage(null);
     }
   }, [route?.params]);
   const trecho = state.trechos.find(item => item.id === trechoId);
   const alturaNum = Number(altura.replace(',', '.'));
   const nivel = altura.trim() && Number.isFinite(alturaNum) && alturaNum > 0 ? calcularNivelArtesp(alturaNum) : null;
-  const canSubmit = !!trecho && !!nivel && !!gps && !!fotoUri && !busy;
+  const canSubmit = !!trecho && !!nivel && !!gps && !!evidencia && !busy && !sensorsBusy;
 
-  const captureGps = () => {
-    if (!trecho) return;
-    setGps({ lat: trecho.lat, lng: trecho.lng, accuracy: 7.4 }); setGpsDenied(false); setMessage(null);
-  };
-  const reset = () => { setAltura(''); setObservacoes(''); setGps(null); setGpsDenied(false); setFotoUri(null); setMessage(null); setResult(null); };
+  const reset = () => { setAltura(''); setObservacoes(''); setGps(null); setEvidencia(null); setMessage(null); setResult(null); };
 
   const submit = async () => {
-    if (!trecho || !gps || !fotoUri || !nivel) return;
+    if (!trecho || !gps || !evidencia || !nivel || sensorsBusy) return;
     setMessage(null);
     try {
-      const created = await registerSurvey({ trechoId: trecho.id, altura, observacoes, fotoUri, gps });
+      const created = await registerSurvey({ trechoId: trecho.id, altura, observacoes, fotoUri: evidencia.uri, evidencia, gps });
       setResult(created);
     } catch (err) { setMessage(err instanceof Error ? err.message : 'Não foi possível registrar o levantamento.'); }
   };
@@ -75,11 +70,11 @@ export default function NovoLevantamentoScreen({ navigation, route }: { navigati
 
   return (
     <Page>
-      <ScreenHeader title="Novo levantamento" subtitle="Fluxo demonstrativo sem acesso a sensores reais" />
+      <ScreenHeader title="Novo levantamento" subtitle="Medição de campo com GPS e evidência identificados" />
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <Content form style={styles.content}>
-            <MessageBanner message="GPS e fotografia são mocks locais identificados. Nenhuma câmera ou localização real será acessada." />
+            <MessageBanner message="Escolha uma foto e uma localização. O registro identifica separadamente o que veio do dispositivo e o que é demonstrativo." />
             {message ? <MessageBanner tone="error" title="Registro não concluído" message={message} /> : null}
 
             <View>
@@ -87,7 +82,7 @@ export default function NovoLevantamentoScreen({ navigation, route }: { navigati
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.segmentRow}>
                 {state.trechos.map(item => {
                   const selected = item.id === trechoId;
-                  return <Pressable key={item.id} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => { setTrechoId(item.id); setGps(null); setGpsDenied(false); setMessage(null); }} style={({ pressed }) => [styles.segmentCard, selected && styles.segmentSelected, pressed && styles.pressed]}><Text style={[styles.segmentKm, selected && styles.segmentKmSelected]}>KM {item.kmInicial.toFixed(1)} a {item.kmFinal.toFixed(1)}</Text><Text numberOfLines={2} style={styles.segmentFaixa}>{item.faixa}</Text><NivelBadge nivel={item.nivelArtesp} compact /></Pressable>;
+                  return <Pressable key={item.id} accessibilityRole="button" accessibilityState={{ selected }} disabled={busy || sensorsBusy} onPress={() => { setTrechoId(item.id); setGps(null); setEvidencia(null); setMessage(null); }} style={({ pressed }) => [styles.segmentCard, selected && styles.segmentSelected, pressed && styles.pressed]}><Text style={[styles.segmentKm, selected && styles.segmentKmSelected]}>KM {item.kmInicial.toFixed(1)} a {item.kmFinal.toFixed(1)}</Text><Text numberOfLines={2} style={styles.segmentFaixa}>{item.faixa}</Text><NivelBadge nivel={item.nivelArtesp} compact /></Pressable>;
                 })}
               </ScrollView>
             </View>
@@ -101,22 +96,11 @@ export default function NovoLevantamentoScreen({ navigation, route }: { navigati
               {nivel ? <View style={styles.levelPreview}><NivelBadge nivel={nivel} /><Text style={[styles.levelMessage, nivel === 3 && { color: Colors.nivel3 }]}>{nivel === 3 ? 'Uma OS será criada ou reutilizada automaticamente.' : 'O histórico será atualizado sem gerar nova OS.'}</Text></View> : null}
             </View>
 
-            <View>
-              <SectionHeader title="3. Anexe a evidência" subtitle="Imagem local fornecida apenas para a demonstração" />
-              {fotoUri ? <View style={styles.photoWrap}><Image source={{ uri: fotoUri }} style={styles.photo} resizeMode="contain" /><View style={styles.photoLabel}><DemoBadge label="Foto de exemplo" /></View></View> : <Card style={styles.photoEmpty}><AppIcon name="image-outline" size={34} color={Colors.primary} /><Text style={styles.photoTitle}>Nenhuma foto adicionada</Text><Text style={styles.photoText}>A evidência mock é obrigatória neste protótipo.</Text></Card>}
-              {fotoUri ? <PhotoCredit /> : null}
-              <View style={styles.actionRow}><PrimaryButton compact label={fotoUri ? 'Recapturar mock' : 'Adicionar foto mock'} icon="camera-outline" onPress={() => { setFotoUri(demoPhotoUri); setMessage(null); }} /><PrimaryButton compact label="Remover" variant="ghost" icon="trash-outline" onPress={() => setFotoUri(null)} disabled={!fotoUri} /></View>
-            </View>
-
-            <View>
-              <SectionHeader title="4. Confirme o GPS" subtitle="Coordenadas mockadas do trecho selecionado" />
-              <Card style={styles.gpsCard}>{gps ? <><View style={styles.gpsTitle}><AppIcon name="location" color={Colors.primary} /><Text style={styles.gpsStatus}>GPS demonstrativo capturado</Text></View><Text style={styles.coords}>{gps.lat.toFixed(5)}, {gps.lng.toFixed(5)}</Text><Text style={styles.accuracy}>Precisão simulada: ±{gps.accuracy.toFixed(1)} m</Text></> : <><View style={styles.gpsTitle}><AppIcon name={gpsDenied ? 'location-outline' : 'navigate-outline'} color={gpsDenied ? Colors.danger : Colors.textTertiary} /><Text style={[styles.gpsStatus, gpsDenied && { color: Colors.danger }]}>{gpsDenied ? 'GPS demonstrativo indisponível' : 'Aguardando captura manual'}</Text></View><Text style={styles.accuracy}>Nenhuma localização real é acessada automaticamente.</Text></>}</Card>
-              <View style={styles.actionRow}><PrimaryButton compact label={gps ? 'Recapturar GPS mock' : 'Capturar GPS mock'} icon="locate-outline" onPress={captureGps} /><PrimaryButton compact label="Simular indisponível" variant="ghost" icon="close-circle-outline" onPress={() => { setGps(null); setGpsDenied(true); }} /></View>
-            </View>
+            <EvidenceFields contextKey={trechoId} trecho={trecho} gps={gps} evidencia={evidencia} onGps={setGps} onEvidencia={setEvidencia} onBusy={setSensorsBusy} disabled={busy} />
 
             <View><Text style={styles.label}>Observações (opcional)</Text><TextInput accessibilityLabel="Observações" value={observacoes} onChangeText={setObservacoes} multiline numberOfLines={4} textAlignVertical="top" placeholder="Ex.: vegetação próxima à sinalização." placeholderTextColor={Colors.textTertiary} style={[styles.input, styles.notes]} /></View>
             <PrimaryButton label="Registrar levantamento" icon="checkmark-circle-outline" onPress={submit} loading={busy} disabled={!canSubmit} />
-            {!canSubmit ? <Text style={styles.help}>Selecione um trecho, informe uma altura válida e adicione a foto e o GPS demonstrativos.</Text> : null}
+            {!canSubmit ? <Text style={styles.help}>Selecione um trecho, informe uma altura válida e adicione a foto e a localização. Aguarde as capturas terminarem.</Text> : null}
           </Content>
         </ScrollView>
       </KeyboardAvoidingView>

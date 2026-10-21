@@ -1,3 +1,4 @@
+import type { Evidencia, Gps } from '../domain/capture';
 // ============================================================
 // VEGTRACK: dados fictícios para demonstração acadêmica
 // Contexto: concessionária fictícia | rodovia demonstrativa SP-021
@@ -148,6 +149,8 @@ export interface OrdemServico {
   observacoes?: string;
   concluidaEm?: string;
   fotoUri?: string;
+  gps?: Gps;
+  evidencia?: Evidencia;
   lat?: number;
   lng?: number;
   accuracy?: number;
@@ -295,6 +298,8 @@ export interface Levantamento {
   temFoto: boolean;
   observacoes?: string;
   fotoUri?: string;
+  gps?: Gps;
+  evidencia?: Evidencia;
   accuracy?: number;
 }
 
