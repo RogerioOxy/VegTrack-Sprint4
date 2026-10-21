@@ -2,7 +2,7 @@
   "expo": {
     "name": "VegTrack",
     "slug": "vegtrack",
-    "version": "3.0.0",
+    "version": "4.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -25,10 +25,34 @@
         "backgroundColor": "#15803d"
       },
       "package": "br.com.motiva.vegtrack",
-      "versionCode": 1,
-      "permissions": []
+      "versionCode": 4,
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
-    "plugins": [],
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permita que o VegTrack use a câmera para fotografar evidências de campo.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Permita que o VegTrack acesse sua localização ao capturar o GPS da vistoria.",
+          "locationAlwaysPermission": false,
+          "locationAlwaysAndWhenInUsePermission": false,
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": false
+        }
+      ]
+    ],
     "web": {
       "bundler": "metro",
       "shortName": "VegTrack",
