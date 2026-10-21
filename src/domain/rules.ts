@@ -51,7 +51,7 @@ export function exigirPerfil(perfil: Perfil | undefined, permitidos: Perfil[], a
 
 export function validarGps(gps: { lat: number; lng: number; accuracy: number }): void {
   if (![gps.lat, gps.lng, gps.accuracy].every(Number.isFinite) || gps.lat < -90 || gps.lat > 90 || gps.lng < -180 || gps.lng > 180 || gps.accuracy <= 0) {
-    throw new Error('A evidência de localização simulada é inválida.');
+    throw new Error('A evidência de localização é inválida.');
   }
 }
 

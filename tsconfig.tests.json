@@ -6,8 +6,8 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": ".test-build",
+    "outDir": "tests/.test-build",
     "rootDir": "src"
   },
-  "include": ["src/domain/**/*.ts", "src/utils/mockData.ts", "src/services/reportContent.ts"]
+  "include": ["src/domain/**/*.ts", "src/utils/mockData.ts", "src/services/reportContent.ts", "src/services/deadline.ts"]
 }

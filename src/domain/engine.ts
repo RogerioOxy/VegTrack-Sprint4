@@ -1,3 +1,4 @@
+import { Evidencia, Gps, normalizarEvidencia, normalizarGps } from './capture';
 import { mockTrechos, mockOrdens, mockFauna, mockHistoricoLevantamentos, mockUser, Trecho, OrdemServico, EspecieRestricao, Levantamento } from '../utils/mockData';
 import { UserSession, atualizarResumo, calcularNivelArtesp, deveCriarOrdem, exigirPerfil, faixaContida, metodoPermitido, restricaoAtiva, validarGps } from './rules';
 import { validarFonte } from './validation';
@@ -11,8 +12,8 @@ export interface Source {
   config: AppConfig; notifications: Notification[]; audit: AuditEntry[]; pendingSync: number;
 }
 export interface AppState extends Source { user: UserSession | null; dashboardStats: ReturnType<typeof atualizarResumo>; }
-export interface SurveyInput { trechoId: string; altura: string; observacoes: string; fotoUri?: string; gps: { lat: number; lng: number; accuracy: number }; }
-export interface CompletionInput { fotoUri: string; observacoes: string; gps: { lat: number; lng: number; accuracy: number }; }
+export interface SurveyInput { trechoId: string; altura: string; observacoes: string; fotoUri?: string; evidencia?: Evidencia; gps: { lat: number; lng: number; accuracy: number; origem?: Gps['origem'] }; }
+export interface CompletionInput { fotoUri: string; evidencia?: Evidencia; observacoes: string; gps: { lat: number; lng: number; accuracy: number; origem?: Gps['origem'] }; }
 export interface StorageAdapter { getItem(key: string): Promise<string | null>; setItem(key: string, value: string): Promise<void>; }
 export const STORAGE_KEY = '@vegtrack/sprint3';
 export const BACKUP_KEY = `${STORAGE_KEY}/antes-do-reset`;
@@ -124,12 +125,14 @@ export class VegTrackStore {
   }
   registerSurvey = (input: SurveyInput) => this.run(async () => {
     this.writable('registrar levantamentos'); validarGps(input.gps);
+    const gps = normalizarGps({ latitude: input.gps.lat, longitude: input.gps.lng, accuracy: input.gps.accuracy }, input.gps.origem ?? 'demonstracao');
+    const evidencia = input.evidencia ? normalizarEvidencia(input.evidencia.uri, input.evidencia.origem) : input.fotoUri?.trim() ? normalizarEvidencia(input.fotoUri, 'demonstracao') : undefined;
     const trecho = this.trecho(input.trechoId);
     if (!input.altura.trim()) throw new Error('Informe a altura da vegetação.');
     const altura = Number(input.altura.replace(',', '.')); const nivel = calcularNivelArtesp(altura);
     const levantamento: Levantamento = { id: this.id('lev'), trechoId: trecho.id, kmInicial: trecho.kmInicial, kmFinal: trecho.kmFinal, faixa: trecho.faixa,
       alturaVegetacaoCm: altura, nivelArtesp: nivel, dataRegistro: this.now().toISOString(), tecnicoNome: this.user!.apelido,
-      ...input.gps, temFoto: Boolean(input.fotoUri?.trim()), fotoUri: input.fotoUri?.trim() || undefined, observacoes: input.observacoes.trim() || undefined };
+      lat: gps.lat, lng: gps.lng, accuracy: gps.accuracy, gps, evidencia, temFoto: Boolean(evidencia), fotoUri: evidencia?.uri, observacoes: input.observacoes.trim() || undefined };
     const next = clone(this.source); next.levantamentos.unshift(levantamento);
     next.trechos = next.trechos.map(t => t.id === trecho.id ? { ...t, alturaVegetacaoCm: altura, nivelArtesp: nivel, ultimoLevantamento: levantamento.dataRegistro } : t);
     let ordem = next.ordens.find(o => o.trechoId === trecho.id && o.status !== 'concluida') ?? null;
@@ -153,11 +156,13 @@ export class VegTrackStore {
   });
   finishOrder = (id: string, input: CompletionInput) => this.run(async () => {
     this.writable('concluir ordens'); const current = this.order(id); validarGps(input.gps);
-    if (!input.fotoUri.trim()) throw new Error('A conclusão exige uma foto demonstrativa.');
+    if (!input.fotoUri.trim() && !input.evidencia) throw new Error('A conclusão exige uma foto.');
+    const gps = normalizarGps({ latitude: input.gps.lat, longitude: input.gps.lng, accuracy: input.gps.accuracy }, input.gps.origem ?? 'demonstracao');
+    const evidencia = normalizarEvidencia(input.evidencia?.uri ?? input.fotoUri, input.evidencia?.origem ?? 'demonstracao');
     if (current.status !== 'em_execucao') throw new Error('A ordem deve estar em execução e ainda não concluída.');
     if (!metodoPermitido(current, this.source.fauna, this.source.config.mes)) throw new Error('Uma restrição ativa impede a conclusão com o método original. Revise a ordem antes de continuar.');
     const next = clone(this.source); next.ordens = next.ordens.map(o => o.id === id ? { ...o, status: 'concluida', concluidaEm: this.now().toISOString(),
-      fotoUri: input.fotoUri.trim(), ...input.gps, concluidaPor: this.user!.apelido, observacoes: input.observacoes.trim() || o.observacoes } : o);
+      fotoUri: evidencia.uri, evidencia, gps, lat: gps.lat, lng: gps.lng, accuracy: gps.accuracy, concluidaPor: this.user!.apelido, observacoes: input.observacoes.trim() || o.observacoes } : o);
     this.audit(next, 'ordem_concluida', current.numero); await this.persist(next);
   });
   escalateOrder = (id: string) => this.run(async () => {

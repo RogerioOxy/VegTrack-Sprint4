@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { VegTrackStore, STORAGE_KEY, BACKUP_KEY, initialSource } = require('../.test-build/domain/engine.js');
-const { validarFonte } = require('../.test-build/domain/validation.js');
+const { VegTrackStore, STORAGE_KEY, BACKUP_KEY, initialSource } = require('./.test-build/domain/engine.js');
+const { validarFonte } = require('./.test-build/domain/validation.js');
 const gps = { lat: -23.7, lng: -46.5, accuracy: 8 };
 const survey = (altura = '35', trechoId = 'trecho_003') => ({ trechoId, altura, observacoes: 'Teste demonstrativo', gps });
 function storage(seed) {
