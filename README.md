@@ -10,7 +10,7 @@ Aplicativo acadêmico do Challenge Motiva, FIAP, para acompanhar vegetação de 
 ## Entrega final
 
 - [Baixar APK](https://github.com/RogerioOxy/VegTrack-Sprint4/releases/download/v4.0.0/VegTrack-4.0.0.apk).
-- [Vídeo final no YouTube](https://youtu.be/-MLHRctqAJE), não listado.
+- [Vídeo final no YouTube](https://youtu.be/OlQhUgffjMg), não listado.
 - [Plano de negócio](docs/PLANO-DE-NEGOCIO.md).
 - [Roteiro de gravação da dupla](docs/ROTEIRO-VIDEO-SPRINT4.md).
 - [Narração para gravar](docs/NARRACAO-PARA-GRAVAR-SPRINT4.txt).
@@ -49,7 +49,7 @@ As contas são fictícias. Não use senhas pessoais. O login não consulta servi
 | 1 | Requisitos no [repositório](https://github.com/lucasouza06/lucasouza06-Challenge-Sprint01-CPAD) e [protótipo navegável no Figma](https://www.figma.com/proto/5oamsogahmd7Se6ZgcjV5S/VegTrack-%E2%80%94-Prot%C3%B3tipo?node-id=2-3&scaling=scale-down&page-id=0%3A1&starting-point-node-id=2%3A3). |
 | 2 | Mapa esquemático, ordens, levantamentos e calendário de fauna. [Repositório](https://github.com/lucasouza06/Challenge-Sprint02-CPAD) e [vídeo](https://www.youtube.com/watch?v=1TPgrU_rzcM). |
 | 3 | Persistência, regras, perfis, fila offline demonstrativa e PDF. [Repositório](https://github.com/RogerioOxy/VegTrack-Sprint3), [vídeo](https://www.youtube.com/watch?v=QTra6W7b7rU) e [testes manuais](docs/TESTES-MANUAIS.md). |
-| 4 | GPS e foto do dispositivo com alternativas identificadas, configuração para APK, plano de negócio e documentação final. [Este repositório](.), [plano](docs/PLANO-DE-NEGOCIO.md), [APK](https://github.com/RogerioOxy/VegTrack-Sprint4/releases/download/v4.0.0/VegTrack-4.0.0.apk) e [vídeo final](https://youtu.be/-MLHRctqAJE). |
+| 4 | GPS e foto do dispositivo com alternativas identificadas, configuração para APK, plano de negócio e documentação final. [Este repositório](.), [plano](docs/PLANO-DE-NEGOCIO.md), [APK](https://github.com/RogerioOxy/VegTrack-Sprint4/releases/download/v4.0.0/VegTrack-4.0.0.apk) e [vídeo final](https://youtu.be/OlQhUgffjMg). |
 
 Nas Sprints 1 e 2, o grupo tinha seis integrantes; a partir da Sprint 3, a entrega é da dupla identificada acima.
 
